@@ -1,0 +1,208 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-clientes
+spec:
+  selector:
+    matchLabels: 
+      app: pod-clientes
+  replicas: 3
+  template: 
+    metadata:
+      name: pod-clientes
+      labels:
+        app: pod-clientes
+    spec:
+      containers:
+      - name: pod-clientes
+        image: brunocercan/api-clientes:dbk8conf
+        ports:
+          - name: flask
+            containerPort: 5000
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-clientes
+  labels:
+    app: pod-clientes
+spec:
+  ports:
+    - name: porta-clientes
+      protocol: "TCP"
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: pod-clientes
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-enderecos
+spec:
+  selector:
+    matchLabels: 
+      app: pod-enderecos
+  replicas: 3
+  template: 
+    metadata:
+      name: pod-enderecos
+      labels:
+        app: pod-enderecos
+    spec:
+      containers:
+      - name: pod-enderecos
+        image: brunocercan/api-enderecos:dbk8conf
+        ports:
+          - name: flask
+            containerPort: 5000
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-enderecos
+  labels:
+    app: pod-enderecos
+spec:
+  ports:
+    - name: porta-enderecos
+      protocol: "TCP"
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: pod-enderecos
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-produtos
+spec:
+  selector:
+      matchLabels: 
+        app: pod-produtos
+  replicas: 3
+  template: 
+    metadata:
+      name: pod-produtos
+      labels:
+        app: pod-produtos
+    spec:
+      containers:
+      - name: pod-produtos
+        image: brunocercan/api-produtos:dbk8conf
+        ports:
+          - name: flask
+            containerPort: 5000
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-produtos
+  labels:
+    app: pod-produtos
+spec:
+  ports:
+    - name: porta-produtos
+      protocol: "TCP"
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: pod-produtos
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels: 
+      app: mysql
+  replicas: 1
+  template: 
+    metadata:
+      name: mysql
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: brunocercan/mysql
+        ports:
+          - name: sql
+            containerPort: 3306
+  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-pod-mysql
+  labels:
+    app: mysql
+spec:
+  ports:
+  - name: porta-db
+    protocol: "TCP"
+    port: 3306
+    targetPort: 3306
+  selector: 
+    app: mysql
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels: 
+      app: nginx
+  replicas: 3
+  template: 
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: brunocercan/nginx:confk8
+        ports:
+            - containerPort: 80
+  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-nginx
+  namespace: default
+  labels:
+    app: lb-nginx
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  ports:
+      - port: 80
+  selector:
+    app: nginx

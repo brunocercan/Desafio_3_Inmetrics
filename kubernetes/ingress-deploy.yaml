@@ -1,0 +1,157 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-clientes
+spec:
+  selector:
+    matchLabels: 
+      app: pod-clientes
+  replicas: 3
+  template: 
+    metadata:
+      name: pod-clientes
+      labels:
+        app: pod-clientes
+    spec:
+      containers:
+      - name: pod-clientes
+        image: brunocercan/api-clientes:rds
+        ports:
+          - name: flask
+            containerPort: 5000
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-clientes
+  labels:
+    app: pod-clientes
+spec:
+  ports:
+    - name: porta-clientes
+      protocol: "TCP"
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: pod-clientes
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-enderecos
+spec:
+  selector:
+    matchLabels: 
+      app: pod-enderecos
+  replicas: 3
+  template: 
+    metadata:
+      name: pod-enderecos
+      labels:
+        app: pod-enderecos
+    spec:
+      containers:
+      - name: pod-enderecos
+        image: brunocercan/api-enderecos:rds
+        ports:
+          - name: flask
+            containerPort: 5000
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-enderecos
+  labels:
+    app: pod-enderecos
+spec:
+  ports:
+    - name: porta-enderecos
+      protocol: "TCP"
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: pod-enderecos
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-produtos
+spec:
+  selector:
+      matchLabels: 
+        app: pod-produtos
+  replicas: 3
+  template: 
+    metadata:
+      name: pod-produtos
+      labels:
+        app: pod-produtos
+    spec:
+      containers:
+      - name: pod-produtos
+        image: brunocercan/api-produtos:rds
+        ports:
+          - name: flask
+            containerPort: 5000
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-produtos
+  labels:
+    app: pod-produtos
+spec:
+  ports:
+    - name: porta-produtos
+      protocol: "TCP"
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: pod-produtos
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: brunocg-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /clientes
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-clientes
+            port:
+              number: 5000
+      - path: /enderecos
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-enderecos
+            port:
+              number: 5000
+      - path: /produtos
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-produtos
+            port:
+              number: 5000

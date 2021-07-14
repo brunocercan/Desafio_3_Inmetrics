@@ -1,0 +1,36 @@
+version: '2'
+services:
+    api-clientes:
+        image: brunocercan/api-clientes
+        container_name: api-clientes
+        networks: 
+            subnet-brunocg:
+                ipv4_address: 172.18.0.2
+        ports:
+            - "5000"
+    
+    api-enderecos:
+        image: brunocercan/api-enderecos
+        container_name: api-enderecos
+        networks: 
+            subnet-brunocg:
+                ipv4_address: 172.18.0.3
+        ports:
+            - "5000"
+
+    api-produtos:
+        image: brunocercan/api-produtos
+        container_name: api-produtos
+        networks: 
+            subnet-brunocg:
+                ipv4_address: 172.18.0.4
+        ports:
+            - "5000"
+        
+    
+networks: 
+    subnet-brunocg:
+        driver: bridge
+        ipam:
+            config: 
+                - subnet: 172.18.0.0/16

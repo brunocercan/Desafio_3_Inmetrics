@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-enderecos
+  labels:
+    name: api-enderecos
+spec:
+  containers:
+  - name: api-enderecos
+    image: brunocercan/api-enderecos
+    ports:
+      - containerPort: 5000
